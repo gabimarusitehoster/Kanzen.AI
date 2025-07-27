@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aizen Chat | Anime AI</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"/>
+  <style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway', sans-serif;
+  }
+
+  body {
+  background-color: #111;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.chat-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+  .chat-container::before {
+    content: "";
+    background: url('https://a.top4top.io/p_3491rbhlb0.jpg') no-repeat center center;
+    background-size: cover;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    filter: brightness(0.4);
+    animation: zoomy 50s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes zoomy {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.08);
+    }
+  }
+
+ .messages {
+  padding: 16px;
+  padding-bottom: 80px; /* 👈 extra space so you can scroll past input box */
+  flex: 1;
+  overflow-y: auto;
+  color: #f0f0f0;
+  backdrop-filter: blur(6px);
+}
+
+  .message {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    max-width: 85%;
+    line-height: 1.5;
+    word-wrap: break-word;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .user {
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .bot {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .input-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  z-index: 10;
+}
+
+  input[type="text"] {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    background-color: #222;
+    color: #fefefe;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #7f00ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #9a00ff;
+  }
+</style>
+</head>
+<body>
+<body>
+  <div class="chat-container">
+    <div class="messages" id="chat-box">
+      <p class="bot"><strong>Aizen:</strong> Welcome... Let us talk, if you're worthy.</p>
+    </div>
+
+    <form class="input-box" id="chat-form">
+      <input type="text" id="user-input" placeholder="Say something to Aizen..." required autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+
+    const persona = "You are Sosuke Aizen from Bleach. Calm, intelligent, charismatic, manipulative, with godlike confidence. Respond like him in a composed, strategic tone.";
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userMessage = userInput.value.trim();
+      if (!userMessage) return;
+
+      appendMessage("user", userMessage);
+      userInput.value = "";
+      userInput.disabled = true;
+
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage, persona })
+        });
+
+        const data = await res.json();
+        appendMessage("bot", data.reply);
+      } catch (err) {
+        appendMessage("bot", "Aizen is displeased. Something went wrong.");
+      } finally {
+        userInput.disabled = false;
+        userInput.focus();
+      }
+    });
+
+    function appendMessage(sender, text) {
+      const msg = document.createElement("p");
+      msg.className = sender;
+      msg.innerHTML = `<strong>${sender === "user" ? "You" : "Aizen"}:</strong> ${text}`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
