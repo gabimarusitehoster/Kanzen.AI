@@ -15,7 +15,16 @@ app.get('/', (req, res) => {
 app.use(express.json());
 
 app.post('/api/chat', async (req, res) => {
-  const { messages } = req.body;
+  const { message, persona } = req.body;
+
+  if (!message || !persona) {
+    return res.status(400).json({ error: 'Message or persona missing' });
+  }
+
+  const messages = [
+    { role: "system", content: persona },
+    { role: "user", content: message }
+  ];
 
   try {
     const response = await axios.post(
@@ -33,11 +42,17 @@ app.post('/api/chat', async (req, res) => {
       }
     );
 
-    const reply = response.data.choices[0].message.content;
+    const reply = response?.data?.choices?.[0]?.message?.content;
+
+    if (!reply) {
+      throw new Error("No reply returned from Groq");
+    }
+
     res.json({ reply });
+
   } catch (err) {
-    console.error("Error from Groq:", err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to fetch response from Groq' });
+    console.error("Groq error:", err.response?.data || err.message);
+    res.status(500).json({ reply: "Aizen is displeased. The realm of Groq has failed us." });
   }
 });
 
