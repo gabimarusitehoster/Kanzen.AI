@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 3000;
 const GROQ_API_KEY = "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";
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-app.use(express.static('public'));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 app.use(express.json());
 
 app.post('/api/chat', async (req, res) => {
