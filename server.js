@@ -41,6 +41,12 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// Auto Ping Logic (Keep-Alive)
+setInterval(() => {
+  axios.get(`https://bleach-ai.onrender.com`)
+    .then(() => console.log('🔁 Auto-ping sent to keep server alive'))
+    .catch(err => console.error('❌ Auto-ping failed:', err.message));
+}, 1000 * 60 * 5);
 app.listen(PORT, () => {
   console.log(`Anime Chat server running on http://localhost:${PORT}`);
 });
